@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Luoo Music Website Crawler Display">
+    <meta name="author" content="Heming Wang">
+
+    <title>Luoo Music Website Crawler Display</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css')}}" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="{{ url_for('static', filename='js/jquery.js') }}"></script>
+    <script src="//d3js.org/d3.v3.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/d3.min.js') }}"></script>
+
+  
+    
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Luoo Stats</a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li>
+                        <a href="#">Stats</a>
+                    </li>
+                    <li>
+                        <a href="#">Services</a>
+                    </li>
+                    <li>
+                        <a href="#">Contact</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <!-- Page Heading -->
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Luoo stats
+                    <small>Luoo Music Website Crawler Display</small>
+                </h1>
+            </div>
+        </div>
+        <!-- /.row -->
+
+        <!-- Projects Row -->
+        <div class="row">
+            <div class="col-md-8 left">
+                <script type="text/javascript">
+
+                var data = {{ tag_data|safe }};
+                var w = 780;
+                var h = 500;
+                var barPadding = 1;
+
+                color = d3.scale.category20c();
+
+                var svg = d3.select("div.left")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", h);
+                svg.selectAll("rect")
+                    .data(data)
+                    .enter()
+                    .append("rect")
+                    .attr("x", function(d,i){ return i*(w/data.length);})
+                    .attr("y", function(d,i) {return h-data[i].number*2.3 -20;})
+                    .attr("width", w/data.length-barPadding)
+                    .attr("height", function(d,i){return data[i].number*2.3 + 'px';})
+                    .attr("fill", function(d,i) {
+                         return color(i);
+                        });
+
+                svg.selectAll("text.values")
+                    .data(data)
+                    .enter()
+                    .append("text")
+                    .text(function(d){ return d.number;})
+                    .attr("x", function(d, i) {
+                        return i * (w / data.length);
+                        })
+                    .attr("y", function(d) {
+                        return h - (d.number) - 17;  //15 is now 14
+                        });
+
+                svg.selectAll("text.labels")
+                    .data(data)
+                    .enter()
+                    .append("text")
+                    .text(function(d){ return d.tag;})
+                    .attr("x", function(d, i) {
+                        return i * (w / data.length);
+                        })
+                    .attr("y", h-3); 
+
+                </script>
+
+            </div>
+            <div class="col-md-4 right">
+                <script type="text/javascript">
+                var data = {{ tag_data|safe }}
+
+                var w = 750,                        //width
+                    h = 600,                            //height
+                    r = 250,                            //radius
+                color = d3.scale.category20c();     //builtin range of colors
+
+                
+                var vis = d3.select("div.right")
+                    .append("svg:svg")              
+                    .data([data])
+                        .attr("width", w)
+                        .attr("height", h)
+                    .append("svg:g")
+                        .attr("transform", "translate(" + r + "," + r + ")")    
+
+                var arc = d3.svg.arc()
+                    .outerRadius(r);
+
+                var pie = d3.layout.pie()
+                    .value(function(d) { return d.number; });
+                
+                var arcs = vis.selectAll("g.slice")
+                        .data(pie) 
+                    .enter()
+                        .append("svg:g")
+                            .attr("class", "slice");
+
+                    arcs.append("svg:path")
+                            .attr("fill", function(d, i) { return color(i); } ) 
+                            .attr("d", arc);
+
+                    arcs.append("svg:text")                                     
+                            .attr("transform", function(d) {                    
+                            d.innerRadius = 0;
+                            d.outerRadius = r;
+                            return "translate(" + arc.centroid(d) + ")";        
+                        })
+                        .attr("text-anchor", "middle")                          
+                        .text(function(d, i) { return data[i].tag; });        
+        
+                </script>
+
+            </div>
+        </div>	
+        <!-- /.row -->
+
+
+        <!-- Footer -->
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; Owen Website 2016</p>
+                </div>
+            </div>
+            <!-- /.row -->
+        </footer>
+
+    </div>
+    <!-- /.container -->
+
+
+
+</body>
+
+</html>
