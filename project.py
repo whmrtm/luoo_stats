@@ -38,11 +38,11 @@ def showMain():
 
 @app.route('/search')
 def showSearch():
-	return render_template('index.html')
+	return render_template('search.html')
 
 @app.route('/contact')
 def showContact():
-	return	render_template('index.html')
+	return	render_template('contact.html')
 
 
 if __name__ == '__main__':
